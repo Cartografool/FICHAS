@@ -54,12 +54,29 @@
       }
 
       .npc-actions button {
-        margin-left: 8px;
-        padding: 6px 12px;
-        background: none;
-        border: 1px solid #666;
-        color: #eee;
+        margin-left: 6px;
+        padding: 6px 14px;
+        font-size: 13px;
+        border-radius: 6px;
         cursor: pointer;
+      }
+
+      .btn-ficha {
+        background: #7c3aed;
+        border: 1px solid #5b21b6;
+        color: #fff;
+      }
+
+      .btn-editar {
+        background: #1e40af;
+        border: 1px solid #1e3a8a;
+        color: #fff;
+      }
+
+      .btn-remover {
+        background: #450a0a;
+        border: 1px solid #7f1d1d;
+        color: #fff;
       }
 
       .modal {
@@ -88,7 +105,11 @@
         background: #000;
         color: #eee;
         border: 1px solid #444;
-        resize: vertical;
+      }
+
+      .modal-content label {
+        font-size: 12px;
+        color: #aaa;
       }
 
       .modal-content button {
@@ -138,7 +159,6 @@
       #vida-barra-fill {
         height: 100%;
         background: #b91c1c;
-        transition: width 0.2s;
       }
 
       #vida-texto {
@@ -150,21 +170,25 @@
         font-weight: bold;
       }
 
-      /* NOVA SEÇÃO DE DESCRIÇÃO */
+      .btn-neg {
+        background: linear-gradient(#7f1d1d, #450a0a);
+        border: 1px solid #991b1b;
+        color: #fff;
+      }
+
+      .btn-pos {
+        background: linear-gradient(#14532d, #052e16);
+        border: 1px solid #166534;
+        color: #fff;
+      }
+
       .descricao {
         margin-top: 12px;
         padding: 10px;
         background: #0b0b0b;
         border: 1px solid #222;
-        font-size: 14px;
         color: #ccc;
         white-space: pre-wrap;
-      }
-
-      .descricao strong {
-        color: #eee;
-        display: block;
-        margin-bottom: 4px;
       }
 
       .fechar-btn {
@@ -174,7 +198,6 @@
         border: none;
         padding: 8px;
         color: #fff;
-        cursor: pointer;
       }
     </style>
   </head>
@@ -185,45 +208,43 @@
         <h2>NPCs</h2>
         <button onclick="openModal()">Adicionar NPC</button>
       </div>
-
       <div id="npc-list"></div>
     </div>
 
-    <!-- MODAL NOVO NPC -->
     <div class="modal" id="modal">
       <div class="modal-content">
-        <h3>Novo NPC</h3>
-
         <input id="nome" placeholder="Nome" />
-        <input id="vida" type="number" placeholder="Vida Máxima (VD)" />
+        <input id="vida" type="number" placeholder="Vida Máxima" />
+
         <select id="tipo">
           <option>Pessoa - Médio</option>
           <option>Criatura - Médio</option>
           <option>Criatura - Grande</option>
         </select>
 
-        <!-- DESCRIÇÃO -->
-        <textarea
-          id="descricao"
-          rows="4"
-          placeholder="Descrição do personagem..."
-        ></textarea>
+        <label>Imagem</label>
+        <input id="imagem" type="file" accept="image/*" />
 
-        <input id="imgInput" type="file" accept="image/*" />
+        <label>Imagem X</label>
+        <input id="imgX" type="range" min="0" max="100" value="50" />
 
-        <button onclick="addNPC()">Adicionar</button>
+        <label>Imagem Y</label>
+        <input id="imgY" type="range" min="0" max="100" value="50" />
+
+        <textarea id="descricao" rows="4" placeholder="Descrição"></textarea>
+
+        <button onclick="confirmarNPC()">Salvar</button>
         <button onclick="closeModal()" style="background: #444">
           Cancelar
         </button>
       </div>
     </div>
 
-    <!-- MODAL FICHA -->
     <div class="modal" id="fichaModal">
       <div class="ficha-card">
         <div class="ficha-top">
           <img id="ficha-img" />
-          <div class="ficha-info">
+          <div>
             <h2 id="ficha-nome"></h2>
             <p>
               <strong>VD:</strong> <span id="vidaMax"></span><br />
@@ -233,65 +254,60 @@
         </div>
 
         <div class="vida-container">
-          <button onclick="alterarVida(-1)">«</button>
+          <button class="btn-neg" onclick="alterarVida(-5)">-5</button>
+          <button class="btn-neg" onclick="alterarVida(-1)">-1</button>
+
           <div class="vida-barra">
             <div id="vida-barra-fill"></div>
             <span id="vida-texto"></span>
           </div>
-          <button onclick="alterarVida(1)">»</button>
+
+          <button class="btn-pos" onclick="alterarVida(1)">+1</button>
+          <button class="btn-pos" onclick="alterarVida(5)">+5</button>
         </div>
 
-        <!-- DESCRIÇÃO NA FICHA -->
-        <div class="descricao" id="ficha-descricao">
+        <div class="descricao">
           <strong>Descrição</strong>
-          <span></span>
+          <span id="ficha-descricao"></span>
         </div>
 
+        <button onclick="editarNPC()">Editar</button>
         <button class="fechar-btn" onclick="fecharFicha()">Fechar</button>
       </div>
     </div>
 
     <script>
       const STORAGE_KEY = "npc_list";
-      const MAX_NPCS = 30;
-
       let npcs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      let tempImage = "";
       let fichaAtualId = null;
+      let editandoId = null;
+      let imagemTemp = null;
 
-      const nomeInput = document.getElementById("nome");
-      const vidaInput = document.getElementById("vida");
-      const tipoInput = document.getElementById("tipo");
-      const descInput = document.getElementById("descricao");
-      const imgInput = document.getElementById("imgInput");
+      const imgInput = document.getElementById("imagem");
 
-      /* conversão de imagem */
-      imgInput.addEventListener("change", (e) => {
-        const file = e.target.files[0];
+      imgInput.addEventListener("change", () => {
+        const file = imgInput.files[0];
         if (!file) return;
 
         const img = new Image();
+        const reader = new FileReader();
+
+        reader.onload = () => (img.src = reader.result);
+
         img.onload = () => {
           const canvas = document.createElement("canvas");
-          const max = 512;
-          let w = img.width;
-          let h = img.height;
+          const size = 256;
 
-          if (w > h && w > max) {
-            h *= max / w;
-            w = max;
-          } else if (h > max) {
-            w *= max / h;
-            h = max;
-          }
+          canvas.width = size;
+          canvas.height = size;
 
-          canvas.width = w;
-          canvas.height = h;
-          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-          tempImage = canvas.toDataURL("image/jpeg", 0.75);
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, size, size);
+
+          imagemTemp = canvas.toDataURL("image/jpeg", 0.7);
         };
 
-        img.src = URL.createObjectURL(file);
+        reader.readAsDataURL(file);
       });
 
       function save() {
@@ -302,104 +318,137 @@
         const list = document.getElementById("npc-list");
         list.innerHTML = "";
 
-        npcs.forEach((npc) => {
+        npcs.forEach((n) => {
           list.innerHTML += `
-            <div class="npc">
-              <img src="${npc.imagem || ""}">
-              <div class="npc-info">
-                <strong>${npc.nome}</strong><br>
-                Vida: ${npc.vidaAtual}/${npc.vidaMax}<br>
-                ${npc.tipo}
-              </div>
-              <div class="npc-actions">
-                <button onclick="openFicha('${npc.id}')">Ficha</button>
-                <button onclick="removeNPC('${npc.id}')">Remover</button>
-              </div>
+          <div class="npc">
+            <img src="${n.imagem || ""}" style="object-position:${n.imgX}% ${
+            n.imgY
+          }%">
+            <div class="npc-info">
+              <strong>${n.nome}</strong><br>
+              Vida ${n.vidaAtual}/${n.vidaMax}<br>
+              ${n.tipo}
             </div>
-          `;
+            <div class="npc-actions">
+              <button class="btn-ficha" onclick="openFicha('${
+                n.id
+              }')">Ficha</button>
+              <button class="btn-editar" onclick="editarNPC('${
+                n.id
+              }')">Editar</button>
+              <button class="btn-remover" onclick="removerNPC('${
+                n.id
+              }')">Remover</button>
+            </div>
+          </div>`;
         });
-      }
-
-      function openModal() {
-        if (npcs.length >= MAX_NPCS) return alert("Limite de NPCs atingido");
-        tempImage = "";
-        imgInput.value = "";
-        document.getElementById("modal").style.display = "flex";
-      }
-
-      function closeModal() {
-        document.getElementById("modal").style.display = "none";
-        nomeInput.value = "";
-        vidaInput.value = "";
-        tipoInput.selectedIndex = 0;
-        descInput.value = "";
-        tempImage = "";
-      }
-
-      function addNPC() {
-        const nome = nomeInput.value.trim();
-        const vida = parseInt(vidaInput.value, 10);
-
-        if (!nome || !vida) return;
-
-        npcs.push({
-          id: crypto.randomUUID(),
-          nome,
-          vidaAtual: vida,
-          vidaMax: vida,
-          tipo: tipoInput.value,
-          descricao: descInput.value.trim(),
-          imagem: tempImage,
-        });
-
-        save();
-        closeModal();
-        render();
-      }
-
-      function removeNPC(id) {
-        npcs = npcs.filter((n) => n.id !== id);
-        save();
-        render();
       }
 
       function openFicha(id) {
         const npc = npcs.find((n) => n.id === id);
         fichaAtualId = id;
 
+        document.getElementById("ficha-img").src = npc.imagem || "";
+        document.getElementById(
+          "ficha-img"
+        ).style.objectPosition = `${npc.imgX}% ${npc.imgY}%`;
         document.getElementById("ficha-nome").innerText = npc.nome;
         document.getElementById("ficha-tipo").innerText = npc.tipo;
         document.getElementById("vidaMax").innerText = npc.vidaMax;
-        document.getElementById("ficha-img").src = npc.imagem || "";
-
-        document.querySelector("#ficha-descricao span").innerText =
+        document.getElementById("ficha-descricao").innerText =
           npc.descricao || "—";
 
         atualizarBarraVida(npc);
         document.getElementById("fichaModal").style.display = "flex";
       }
 
-      function alterarVida(valor) {
+      function alterarVida(v) {
         const npc = npcs.find((n) => n.id === fichaAtualId);
-        npc.vidaAtual = Math.max(
-          0,
-          Math.min(npc.vidaAtual + valor, npc.vidaMax)
-        );
+        npc.vidaAtual = Math.max(0, Math.min(npc.vidaAtual + v, npc.vidaMax));
         atualizarBarraVida(npc);
         save();
-        render();
       }
 
       function atualizarBarraVida(npc) {
-        const perc = (npc.vidaAtual / npc.vidaMax) * 100;
-        document.getElementById("vida-barra-fill").style.width = perc + "%";
-        document.getElementById("vida-texto").innerText =
-          npc.vidaAtual + " / " + npc.vidaMax;
+        const p = (npc.vidaAtual / npc.vidaMax) * 100;
+        document.getElementById("vida-barra-fill").style.width = p + "%";
+        document.getElementById(
+          "vida-texto"
+        ).innerText = `${npc.vidaAtual} / ${npc.vidaMax}`;
       }
 
       function fecharFicha() {
         document.getElementById("fichaModal").style.display = "none";
-        fichaAtualId = null;
+        render();
+      }
+
+      function openModal() {
+        editandoId = null;
+        imagemTemp = null;
+        nome.value = vida.value = descricao.value = "";
+        imgX.value = imgY.value = 50;
+        modal.style.display = "flex";
+      }
+
+      function confirmarNPC() {
+        if (!nome.value || vida.value <= 0) return;
+
+        if (editandoId) {
+          const n = npcs.find((n) => n.id === editandoId);
+          Object.assign(n, {
+            nome: nome.value,
+            vidaMax: +vida.value,
+            vidaAtual: Math.min(n.vidaAtual, vida.value),
+            tipo: tipo.value,
+            descricao: descricao.value,
+            imagem: imagemTemp || n.imagem,
+            imgX: imgX.value,
+            imgY: imgY.value,
+          });
+        } else {
+          npcs.push({
+            id: crypto.randomUUID(),
+            nome: nome.value,
+            vidaAtual: +vida.value,
+            vidaMax: +vida.value,
+            tipo: tipo.value,
+            descricao: descricao.value,
+            imagem: imagemTemp,
+            imgX: imgX.value,
+            imgY: imgY.value,
+          });
+        }
+
+        save();
+        closeModal();
+        render();
+      }
+
+      function editarNPC(id = fichaAtualId) {
+        const n = npcs.find((n) => n.id === id);
+        editandoId = id;
+
+        nome.value = n.nome;
+        vida.value = n.vidaMax;
+        tipo.value = n.tipo;
+        descricao.value = n.descricao;
+        imgX.value = n.imgX;
+        imgY.value = n.imgY;
+        imagemTemp = n.imagem;
+
+        fecharFicha();
+        modal.style.display = "flex";
+      }
+
+      function removerNPC(id) {
+        if (!confirm("Remover NPC?")) return;
+        npcs = npcs.filter((n) => n.id !== id);
+        save();
+        render();
+      }
+
+      function closeModal() {
+        modal.style.display = "none";
       }
 
       render();
