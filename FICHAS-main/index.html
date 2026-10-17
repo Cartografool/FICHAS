@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>NPCs</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>NPCs</h2>
+        <button onclick="openModal()">Adicionar NPC</button>
+      </div>
+      <div id="npc-list"></div>
+    </div>
+
+    <div class="modal" id="modal">
+      <div class="modal-content">
+        <input id="nome" placeholder="Nome" />
+        <input id="vida" type="number" placeholder="Vida Máxima" />
+        <input id="pdMaxInput" type="number" min="0" placeholder="PD Máximo" value="16" />
+
+        <label for="funcao">Perfil do NPC</label>
+        <select id="funcao">
+          <option value="">Nenhuma</option>
+          <option value="Executor">Executor</option>
+          <option value="Analista">Analista</option>
+          <option value="Vigilante">Vigilante</option>
+        </select>
+
+        <select id="tipo">
+          <option>Pessoa - Médio</option>
+          <option>Criatura - Médio</option>
+          <option>Criatura - Grande</option>
+        </select>
+
+        <label>Imagem</label>
+        <input id="imagem" type="file" accept="image/*" />
+
+        <label>Imagem X</label>
+        <input id="imgX" type="range" min="0" max="100" value="50" />
+
+        <label>Imagem Y</label>
+        <input id="imgY" type="range" min="0" max="100" value="50" />
+
+        <textarea id="descricao" rows="4" placeholder="Descrição"></textarea>
+
+        <button onclick="confirmarNPC()">Salvar</button>
+        <button onclick="closeModal()" style="background: #444">
+          Cancelar
+        </button>
+      </div>
+    </div>
+
+    <div class="modal" id="fichaModal">
+      <div class="ficha-card">
+        <div class="ficha-top">
+          <img id="ficha-img" />
+          <div>
+            <h2 id="ficha-nome"></h2>
+            <p>
+              <strong>VD:</strong> <span id="vidaMax"></span><br />
+              <span id="ficha-tipo"></span>
+            </p>
+          </div>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-main">
+            <div class="stat-icon" aria-label="Pontos de vida"><img src="assets/coracao.png" alt="Coração" /></div>
+            <div id="vida-barra" class="stat-bar" role="progressbar" aria-label="PV restante" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+              <button onclick="alterarVida(-1)" aria-label="Diminuir PV">‹</button>
+              <span class="stat-value">PV <span id="vida-texto">10/10</span></span>
+              <button onclick="alterarVida(1)" aria-label="Aumentar PV">›</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-main">
+            <div class="stat-icon" aria-label="Pontos de determinação"><img src="assets/cerebro.png" alt="Cérebro" /></div>
+            <div id="pd-barra" class="stat-bar" role="progressbar" aria-label="PD restante" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+              <button onclick="alterarPD(-1)" aria-label="Diminuir PD">‹</button>
+              <span class="stat-value">PD <span id="pd-texto">16/16</span></span>
+              <button onclick="alterarPD(1)" aria-label="Aumentar PD">›</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="descricao">
+          <strong>Descrição</strong>
+          <span id="ficha-descricao"></span>
+        </div>
+
+        <div class="ficha-actions">
+          <button onclick="editarNPC()">Editar</button>
+          <button class="btn-remover" onclick="removerNPC(fichaAtualId)">Remover</button>
+          <button class="fechar-btn" onclick="fecharFicha()">Fechar</button>
+        </div>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>

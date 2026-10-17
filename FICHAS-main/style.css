@@ -1,0 +1,734 @@
+body {
+  margin: 0;
+  background: #0b0b0b;
+  color: #eee;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  width: 900px;
+  margin: 30px auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header button {
+  padding: 8px 14px;
+  background: #7c3aed;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+#npc-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  align-items: stretch;
+}
+
+.npc {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #333;
+  border-radius: 8px;
+  margin: 0;
+  background: linear-gradient(180deg, #151515, #090a0c);
+  box-shadow: 0 8px 24px #0008;
+}
+
+.npc-portrait {
+  position: relative;
+  height: 235px;
+  overflow: hidden;
+  background: #101114;
+  border-bottom: 1px solid var(--role-color, #fff);
+}
+
+.npc-portrait img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border: 0;
+  margin: 0;
+  filter: saturate(0.95);
+  transition:
+    transform 0.25s ease,
+    filter 0.25s ease;
+}
+
+.npc:hover .npc-portrait img {
+  transform: scale(1.035);
+  filter: saturate(1.08);
+}
+
+.npc-portrait::after {
+  content: "";
+  position: absolute;
+  inset: 35% 0 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.94));
+  pointer-events: none;
+}
+
+.npc-portrait-info {
+  position: absolute;
+  z-index: 1;
+  left: 12px;
+  right: 12px;
+  bottom: 10px;
+  color: #fff;
+  text-shadow: 0 2px 5px #000;
+}
+
+.npc-portrait-info strong {
+  display: block;
+  font-size: 23px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+  font-family: "NomeNPC", sans-serif;
+}
+.npc-portrait-info span {
+  display: block;
+  margin-top: 4px;
+  color: #e2e2e2;
+  font-size: 13px;
+  font-family: "FontPadrãosemi";
+}
+
+.npc-info {
+  padding: 10px 12px 12px;
+  flex: 1;
+  min-width: 0;
+}
+.npc-meta {
+  color: #ddd;
+  font-size: 13px;
+  line-height: 1.5;
+  font-family: "FontPadrão";
+}
+.role-label {
+  display: block;
+  margin-top: 9px;
+  font-size: 12px;
+}
+
+.npc-actions {
+  display: flex;
+  gap: 6px;
+  padding: 0 12px 12px;
+}
+.npc-actions button {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 4px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-ficha,
+.btn-editar {
+  background: #fff;
+  border: 1px solid #fff;
+  color: #111;
+}
+.btn-remover {
+  background: #171717;
+  border: 1px solid #fff;
+  color: #fff;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.modal-content {
+  background: #111;
+  padding: 20px;
+  width: 320px;
+  border: 1px solid #333;
+}
+
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 6px;
+  background: #000;
+  color: #eee;
+  border: 1px solid #444;
+}
+
+.modal-content label {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.modal-content button {
+  width: 100%;
+  padding: 8px;
+  margin-top: 6px;
+  background: #7c3aed;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.ficha-card {
+  --borda: #d9d9d9;
+  background: rgba(8, 10, 15, 0.96);
+  width: min(520px, calc(100vw - 36px));
+  border: 0;
+  padding: 24px 18px 18px;
+  color: #fff;
+  font-family: "FontStatus", serif;
+  box-sizing: border-box;
+  clip-path: polygon(3% 0, 100% 0, 100% 94%, 97% 100%, 0 100%);
+  position: relative;
+}
+
+.ficha-top {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.ficha-top img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border: 3px solid var(--borda);
+  transform: skew(-8deg);
+  background: #14263b;
+}
+
+.ficha-top h2 {
+  margin: 0 0 5px;
+  font-size: 24px;
+}
+.ficha-top p {
+  margin: 0;
+  color: #d8e7ff;
+  font-family: "FontPadrão", sans-serif;
+  font-size: 13px;
+}
+
+.stat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 15px 0 20px;
+}
+
+.stat-main {
+  display: grid;
+  grid-template-columns: 66px 1fr;
+  align-items: center;
+  gap: 7px;
+}
+
+.stat-icon {
+  width: 60px;
+  height: 60px;
+  display: grid;
+  place-items: center;
+  color: white;
+  background: var(--azul);
+  border: 3px solid var(--borda);
+  clip-path: polygon(16% 0, 100% 0, 86% 100%, 0 88%);
+  font-size: 27px;
+}
+
+.stat-bar {
+  min-height: 54px;
+  display: grid;
+  grid-template-columns: 38px 1fr 38px;
+  align-items: center;
+  text-align: center;
+  background: #17202b;
+  border: 3px solid var(--borda);
+  outline: 2px solid #111;
+  position: relative;
+  overflow: hidden;
+  clip-path: polygon(0 0, 100% 0, 94% 100%, 0 100%);
+  font-size: 25px;
+  font-weight: bold;
+  text-shadow: 1px 1px #234;
+}
+
+.stat-bar::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--fill, 100%);
+  background: var(--azul);
+  transition: width 650ms cubic-bezier(0.22, 0.8, 0.25, 1);
+  pointer-events: none;
+}
+
+.stat-bar button {
+  position: relative;
+  z-index: 1;
+  border: 0;
+  background: transparent;
+  color: white;
+  font-size: 25px;
+  cursor: pointer;
+  font-family: Georgia, serif;
+}
+
+.stat-bar button:disabled {
+  opacity: 0.35;
+}
+.stat-bar .stat-value {
+  white-space: nowrap;
+  position: relative;
+  z-index: 1;
+}
+.descricao {
+  margin-top: 16px;
+  padding: 10px;
+  background: rgba(10, 14, 20, 0.8);
+  border: 1px solid #2c4f77;
+  color: #dce8f7;
+  font-family: "FontPadrãosemi", sans-serif;
+  font-size: 13px;
+}
+
+body {
+  background: radial-gradient(ellipse at top, #142b45 0%, #080f19 65%);
+  color: #eaf3ff;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+}
+.container {
+  width: min(900px, calc(100% - 28px));
+}
+.header {
+  border-bottom: 1px solid #2c4f77;
+  padding-bottom: 12px;
+}
+.header h2 {
+  color: #d9ebff;
+  letter-spacing: 1px;
+}
+.header button,
+.modal-content button {
+  background: #3e78bb;
+  border: 1px solid #8fc5ff;
+  color: #fff;
+  border-radius: 4px;
+  transition:
+    background 0.18s,
+    transform 0.18s,
+    box-shadow 0.18s;
+}
+button {
+  transition:
+    background 0.18s,
+    transform 0.18s,
+    box-shadow 0.18s;
+}
+button:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+  box-shadow: 0 0 12px #3e78bb55;
+}
+.npc {
+  background: linear-gradient(
+    110deg,
+    color-mix(in srgb, var(--role-color, #3e78bb) 18%, #101d2c),
+    #0b1420
+  );
+  border: 1px solid color-mix(in srgb, var(--role-color, #3e78bb) 55%, #101d2c);
+  border-left: 4px solid var(--role-color, #3e78bb);
+  border-radius: 3px;
+  transition:
+    background 0.25s,
+    border-color 0.25s;
+  cursor: pointer;
+}
+.npc img {
+  border-color: var(--role-color, #3e78bb);
+}
+.btn-ficha,
+.btn-editar {
+  background: #3e78bb;
+  border: 1px solid #6da8e8;
+  color: #fff;
+}
+.btn-remover {
+  background: #172a40;
+  border: 1px solid #456a91;
+  color: #d7eaff;
+}
+.modal {
+  background: rgba(2, 8, 16, 0.82);
+  backdrop-filter: blur(4px);
+}
+.modal-content {
+  background: #101d2c;
+  border: 1px solid #3e78bb;
+  border-radius: 4px;
+  box-shadow: 0 15px 45px #0009;
+}
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+  box-sizing: border-box;
+  background: #080f19;
+  color: #eaf3ff;
+  border: 1px solid #2c4f77;
+  border-radius: 3px;
+}
+.modal-content label {
+  color: #a9c8e9;
+}
+.ficha-card {
+  box-shadow: 0 18px 60px #000a;
+  border: 1px solid var(--azul);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.ficha-card .ficha-top img {
+  border-color: var(--azul);
+}
+.ficha-card .descricao {
+  border-color: var(--azul);
+}
+.ficha-card > button:not(.fechar-btn) {
+  background: var(--azul);
+  border: 1px solid var(--azul-claro);
+  color: #fff;
+}
+.ficha-card .fechar-btn {
+  border-color: var(--azul);
+}
+.npc-role {
+  display: block;
+  margin-top: 7px;
+  padding: 5px 7px;
+  background: #080f19;
+  color: #eaf3ff;
+  border: 1px solid #2c4f77;
+  border-radius: 3px;
+  max-width: 150px;
+}
+.role-label {
+  display: block;
+  margin-top: 7px;
+  color: #a9c8e9;
+  font-size: 12px;
+}
+.role-select {
+  margin-top: 4px;
+  padding: 6px;
+  background: #080f19;
+  color: #eaf3ff;
+  border: 1px solid #2c4f77;
+  border-radius: 3px;
+}
+.npc-role-tag {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 3px 7px;
+  font-size: 11px;
+  border: 1px solid var(--role-color, #3e78bb);
+  color: #fff;
+  background: color-mix(in srgb, var(--role-color, #3e78bb) 30%, #080f19);
+  font-family: "FontPadrãosemi";
+}
+.stat-icon img {
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+  display: block;
+}
+.stat-value.bump {
+  display: inline-block;
+  animation: statBump 0.24s ease-out;
+}
+@keyframes statBump {
+  0% {
+    transform: scale(1);
+    text-shadow: 1px 1px #234;
+  }
+  45% {
+    transform: scale(1.16);
+    text-shadow: 0 0 14px #d6eaff;
+  }
+  100% {
+    transform: scale(1);
+    text-shadow: 1px 1px #234;
+  }
+}
+.stat-bar button:active {
+  transform: scale(0.82);
+  color: #d9ebff;
+}
+.fechar-btn {
+  background: #1a3048;
+  border: 1px solid #3e78bb;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.ficha-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  align-items: stretch;
+}
+.ficha-actions button {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 38px;
+  box-sizing: border-box;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 3px;
+  background: var(--azul);
+  border: 1px solid var(--azul-claro);
+  color: #fff;
+}
+.ficha-actions .fechar-btn {
+  width: auto;
+  margin-top: 0;
+}
+
+/* Tema branco com o fundo fornecido; PV e PD preservam suas cores originais */
+:root {
+  --azul: #ffffff;
+  --azul-claro: #ffffff;
+  --fundo: #111214;
+  --painel: #202226;
+  --borda-azul: #ffffff;
+}
+body {
+  background:
+    linear-gradient(rgba(8, 9, 11, 0.58), rgba(8, 9, 11, 0.72)),
+    url("assets/background.png") center center / cover fixed no-repeat;
+  background-color: #090a0c;
+  color: #f1f2f4;
+}
+.header {
+  border-bottom-color: #ffffff;
+}
+.header h2 {
+  color: #f1f2f4;
+}
+.header button,
+.modal-content button,
+.btn-ficha,
+.btn-editar,
+.ficha-card > button:not(.fechar-btn) {
+  background: #ffffff;
+  border: 1px solid #ffffff;
+  color: #111111;
+}
+button:hover {
+  box-shadow: 0 0 12px #ffffff55;
+}
+.npc {
+  background: linear-gradient(
+    110deg,
+    color-mix(in srgb, var(--role-color, #ffffff) 13%, #17181b),
+    rgba(14, 15, 17, 0.94)
+  );
+  border-color: color-mix(in srgb, var(--role-color, #ffffff) 55%, #17181b);
+  border-left-color: var(--role-color, #bfc4cc);
+}
+.npc img {
+  border-color: var(--role-color, #ffffff);
+}
+.btn-remover {
+  background: #171717;
+  border: 1px solid #ffffff;
+  color: #ffffff;
+}
+.modal {
+  background: rgba(0, 0, 0, 0.78);
+}
+.modal-content {
+  background: rgba(18, 18, 18, 0.97);
+  border-color: #ffffff;
+}
+.modal-content input,
+.modal-content select,
+.modal-content textarea,
+.npc-role,
+.role-select {
+  background: #151515;
+  color: #ffffff;
+  border-color: #ffffff;
+}
+.modal-content label,
+.role-label {
+  color: #ffffff;
+}
+.ficha-card {
+  --azul: #ffffff;
+  --azul-claro: #ffffff;
+  --borda-tema: #ffffff;
+  background: rgba(20, 21, 24, 0.96);
+  border-color: var(--borda-tema, #ffffff);
+}
+.ficha-top img {
+  background: #2b2d31;
+}
+.ficha-top p {
+  color: #d3d6dc;
+}
+.descricao {
+  background: rgba(10, 11, 11, 0.78);
+  border-color: #ffffff;
+  color: #ffffff;
+}
+.npc-role-tag {
+  color: #fff;
+}
+.fechar-btn {
+  background: #292b30;
+  border-color: #ffffff;
+  color: #fff;
+}
+
+/* Seleção de fichas em cartões verticais; a cor do perfil contorna cada cartão. */
+.npc {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--role-color, #3e78bb) 12%, #17181b),
+    rgba(9, 10, 12, 0.98)
+  );
+  border: 1px solid color-mix(in srgb, var(--role-color, #3e78bb) 72%, #17181b);
+  border-top: 2px solid var(--role-color, #3e78bb);
+  border-left: 1px solid
+    color-mix(in srgb, var(--role-color, #3e78bb) 72%, #17181b);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+.npc:hover {
+  box-shadow:
+    0 10px 28px #000a,
+    0 0 14px color-mix(in srgb, var(--role-color, #fff) 20%, transparent);
+  transform: translateY(-2px);
+}
+.npc-portrait {
+  border-bottom-color: var(--role-color, #fff);
+}
+.npc-role-tag {
+  background: color-mix(in srgb, var(--role-color, #3e78bb) 28%, #080808);
+  border-color: var(--role-color, #fff);
+}
+.role-select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width: 520px) {
+  .container {
+    width: calc(100% - 24px);
+    margin: 16px auto;
+  }
+  #npc-list {
+    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 10px;
+  }
+  .npc-portrait {
+    height: 190px;
+  }
+  .npc-portrait-info strong {
+    font-size: 19px;
+  }
+  .npc-actions {
+    padding-left: 8px;
+    padding-right: 8px;
+    gap: 4px;
+  }
+  .npc-actions button {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 520px) {
+  .ficha-card {
+    padding: 16px 10px;
+  }
+  .stat-main {
+    grid-template-columns: 52px 1fr;
+    gap: 5px;
+  }
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 22px;
+  }
+  .stat-bar {
+    grid-template-columns: 28px 1fr 28px;
+    font-size: 19px;
+  }
+}
+
+.fechar-btn {
+  margin-top: 12px;
+  width: 100%;
+  background: var(--azul);
+  border: 1px solid var(--azul-claro);
+  padding: 8px;
+  color: #fff;
+}
+@font-face {
+  font-family: "NomeNPC";
+  src: url("assets/fonts/Lovera.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "FontPadrão";
+  src: url("assets/fonts/OptimaNovaLTProDemi-Do8kJQTT.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "FontStatus";
+  src: url("assets/fonts/OptimaNovaLTProBold-C8MDgS8n.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "FontPadrãosemi";
+  src: url("assets/fonts/OptimaNovaLTProRegular-DBzZ6AAd.otf")
+    format("opentype");
+  font-weight: 400;
+  font-style: normal;
+}
