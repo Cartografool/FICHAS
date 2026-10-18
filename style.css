@@ -260,7 +260,7 @@ body {
 .stat-bar {
   min-height: 54px;
   display: grid;
-  grid-template-columns: 38px 1fr 38px;
+  grid-template-columns: 38px 38px minmax(0, 1fr) 38px 38px;
   align-items: center;
   text-align: center;
   background: #17202b;
@@ -692,7 +692,7 @@ button:hover {
     font-size: 22px;
   }
   .stat-bar {
-    grid-template-columns: 28px 1fr 28px;
+    grid-template-columns: 28px 28px minmax(0, 1fr) 28px 28px;
     font-size: 19px;
   }
 }
@@ -731,4 +731,280 @@ button:hover {
     format("opentype");
   font-weight: 400;
   font-style: normal;
+}
+
+
+/* Melhorias mobile: ficha ampla e controles de PV/PD confortáveis ao toque. */
+@media (max-width: 600px) {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    background-attachment: scroll;
+  }
+
+  .container {
+    width: calc(100% - 24px);
+    margin: 14px auto 24px;
+  }
+
+  .header {
+    gap: 12px;
+    align-items: center;
+  }
+
+  .header h2 {
+    font-size: 22px;
+    margin: 0;
+  }
+
+  .header button {
+    min-height: 46px;
+    padding: 10px 14px;
+    font-size: 15px;
+  }
+
+  #npc-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .npc {
+    display: grid;
+    grid-template-columns: 112px minmax(0, 1fr);
+    grid-template-rows: 1fr auto;
+    align-items: stretch;
+  }
+
+  .npc-portrait {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    height: 154px;
+    min-height: 154px;
+    border-bottom: 0;
+    border-right: 1px solid var(--role-color, #fff);
+  }
+
+  .npc-portrait-info {
+    left: 7px;
+    right: 7px;
+    bottom: 8px;
+  }
+
+  .npc-portrait-info strong {
+    font-size: 17px;
+  }
+
+  .npc-portrait-info span {
+    font-size: 12px;
+  }
+
+  .npc-info {
+    grid-column: 2;
+    grid-row: 1;
+    padding: 12px 10px 6px;
+  }
+
+  .npc-meta {
+    font-size: 14px;
+  }
+
+  .npc-actions {
+    grid-column: 2;
+    grid-row: 2;
+    padding: 4px 8px 10px;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .npc-actions button {
+    min-height: 40px;
+    padding: 8px 5px;
+    font-size: 12px;
+  }
+
+  .modal {
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  #fichaModal {
+    align-items: center;
+    padding: 8px;
+  }
+
+  .ficha-card {
+    width: 100%;
+    max-width: 560px;
+    max-height: calc(100dvh - 16px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 22px 16px 16px;
+    clip-path: none;
+    border-radius: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ficha-top {
+    grid-template-columns: 82px minmax(0, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+
+  .ficha-top img {
+    width: 78px;
+    height: 78px;
+  }
+
+  .ficha-top h2 {
+    font-size: clamp(21px, 6vw, 27px);
+    overflow-wrap: anywhere;
+  }
+
+  .ficha-top p {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .stat-row {
+    margin: 18px 0 22px;
+    gap: 8px;
+  }
+
+  .stat-main {
+    grid-template-columns: 62px minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .stat-icon {
+    width: 58px;
+    height: 58px;
+    font-size: 25px;
+  }
+
+  .stat-bar {
+    min-height: 72px;
+    grid-template-columns: 44px 44px minmax(0, 1fr) 44px 44px;
+    font-size: clamp(17px, 4.5vw, 22px);
+    clip-path: none;
+    border-radius: 5px;
+    touch-action: manipulation;
+  }
+
+  .stat-bar {
+    grid-template-columns: 44px 44px minmax(0, 1fr) 44px 44px;
+  }
+
+  .stat-bar button {
+    width: 100%;
+    height: 66px;
+    min-width: 48px;
+    padding: 0;
+    font-size: 38px;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .stat-bar .stat-value {
+    font-size: clamp(16px, 4.2vw, 21px);
+    white-space: normal;
+    line-height: 1.2;
+  }
+
+  .descricao {
+    margin-top: 18px;
+    padding: 13px;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .ficha-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .ficha-actions button {
+    min-height: 48px;
+    height: auto;
+    padding: 10px 8px;
+    font-size: 14px;
+  }
+
+  .ficha-actions .fechar-btn {
+    grid-column: 1 / -1;
+  }
+
+  .modal-content {
+    width: 100%;
+    max-width: 420px;
+    max-height: calc(100dvh - 20px);
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 18px;
+  }
+
+  .modal-content input,
+  .modal-content select,
+  .modal-content textarea {
+    min-height: 42px;
+    font-size: 16px;
+  }
+
+  .modal-content button {
+    min-height: 46px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 360px) {
+  .ficha-card {
+    padding: 16px 10px 12px;
+  }
+
+  .stat-main {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .stat-icon {
+    width: 46px;
+    height: 46px;
+  }
+
+  .stat-bar {
+    grid-template-columns: 44px 44px minmax(0, 1fr) 44px 44px;
+    min-height: 66px;
+  }
+
+  .stat-bar button {
+    min-width: 44px;
+    height: 60px;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  button:hover {
+    transform: none;
+    box-shadow: none;
+    filter: none;
+  }
+
+  .stat-bar button:active,
+  .ficha-actions button:active,
+  .npc-actions button:active {
+    transform: scale(0.96);
+    filter: brightness(1.2);
+  }
 }

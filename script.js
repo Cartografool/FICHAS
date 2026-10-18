@@ -1,5 +1,14 @@
 const STORAGE_KEY = "npc_list";
-      let npcs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      function carregarNPCs() {
+        try {
+          const dados = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+          return Array.isArray(dados) ? dados : [];
+        } catch (erro) {
+          console.error("Não foi possível carregar os NPCs salvos:", erro);
+          return [];
+        }
+      }
+      let npcs = carregarNPCs();
       let fichaAtualId = null;
       let editandoId = null;
       let imagemTemp = null;
@@ -44,33 +53,67 @@ const STORAGE_KEY = "npc_list";
       });
 
       function save() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(npcs));
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(npcs));
+          return true;
+        } catch (erro) {
+          console.error("Não foi possível salvar os NPCs:", erro);
+          alert("Não foi possível salvar. O armazenamento do navegador pode estar cheio; tente usar imagens menores.");
+          return false;
+        }
       }
 
       function render() {
         const list = document.getElementById("npc-list");
-        list.innerHTML = "";
-
+        list.replaceChildren();
         npcs.forEach((n) => {
-          list.innerHTML += `
-          <div class="npc" role="button" tabindex="0" aria-label="Abrir ficha de ${n.nome}" onclick="openFicha('${n.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openFicha('${n.id}') }" style="--role-color:${corDaFuncao(n.funcao)}">
-            <div class="npc-portrait">
-              <img src="${n.imagem || ""}" alt="Retrato de ${n.nome}" style="object-position:${n.imgX}% ${n.imgY}%">
-              <div class="npc-portrait-info">
-                <strong>${n.nome}</strong>
-                <span>${n.tipo || "Pessoa"}</span>
-              </div>
-            </div>
-            <div class="npc-info">
-              <div class="npc-meta">Vida ${n.vidaAtual}/${n.vidaMax}</div>
-              <span class="npc-role-tag" style="--role-color:${corDaFuncao(n.funcao)}">${n.funcao || "Sem perfil"}</span>
-            </div>
-          </div>`;
+          const card = document.createElement("div");
+          card.className = "npc";
+          card.setAttribute("role", "button");
+          card.tabIndex = 0;
+          card.setAttribute("aria-label", `Abrir ficha de ${n.nome || "NPC"}`);
+          card.style.setProperty("--role-color", corDaFuncao(n.funcao));
+          card.addEventListener("click", () => openFicha(n.id));
+          card.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              openFicha(n.id);
+            }
+          });
+
+          const portrait = document.createElement("div");
+          portrait.className = "npc-portrait";
+          const image = document.createElement("img");
+          image.src = n.imagem || "";
+          image.alt = `Retrato de ${n.nome || "NPC"}`;
+          image.style.objectPosition = `${Number(n.imgX ?? 50)}% ${Number(n.imgY ?? 50)}%`;
+          const portraitInfo = document.createElement("div");
+          portraitInfo.className = "npc-portrait-info";
+          const name = document.createElement("strong");
+          name.textContent = n.nome || "Sem nome";
+          const type = document.createElement("span");
+          type.textContent = n.tipo || "Pessoa";
+          portraitInfo.append(name, type);
+          portrait.append(image, portraitInfo);
+
+          const info = document.createElement("div");
+          info.className = "npc-info";
+          const life = document.createElement("div");
+          life.className = "npc-meta";
+          life.textContent = `Vida ${n.vidaAtual ?? 0}/${n.vidaMax ?? 0}`;
+          const role = document.createElement("span");
+          role.className = "npc-role-tag";
+          role.style.setProperty("--role-color", corDaFuncao(n.funcao));
+          role.textContent = n.funcao || "Sem perfil";
+          info.append(life, role);
+          card.append(portrait, info);
+          list.append(card);
         });
       }
 
       function openFicha(id) {
         const npc = npcs.find((n) => n.id === id);
+        if (!npc) return;
         fichaAtualId = id;
         const cor = corDaFuncao(npc.funcao);
         const fichaCard = document.querySelector(".ficha-card");
@@ -105,7 +148,8 @@ const STORAGE_KEY = "npc_list";
 
       function alterarVida(v) {
         const npc = npcs.find((n) => n.id === fichaAtualId);
-        npc.vidaAtual = Math.max(0, Math.min(npc.vidaAtual + v, npc.vidaMax));
+        if (!npc) return;
+        npc.vidaAtual = Math.max(0, Math.min(Number(npc.vidaAtual || 0) + v, Number(npc.vidaMax || 0)));
         atualizarBarraVida(npc);
         animarValor("vida-texto");
         save();
@@ -149,6 +193,7 @@ const STORAGE_KEY = "npc_list";
       function openModal() {
         editandoId = null;
         imagemTemp = null;
+        imgInput.value = "";
         nome.value = vida.value = descricao.value = "";
         pdMaxInput.value = 16;
         funcao.value = "";
@@ -157,16 +202,26 @@ const STORAGE_KEY = "npc_list";
       }
 
       function confirmarNPC() {
-        if (!nome.value || vida.value <= 0) return;
+        const nomeLimpo = nome.value.trim();
+        const vidaMaxima = Number(vida.value);
+        const pdMaximo = Math.max(0, Number(pdMaxInput.value || 16));
+        if (!nomeLimpo || !Number.isFinite(vidaMaxima) || vidaMaxima <= 0) {
+          alert("Informe um nome e uma Vida Máxima maior que zero.");
+          return;
+        }
+        if (!Number.isFinite(pdMaximo)) {
+          alert("Informe um valor válido para PD Máximo.");
+          return;
+        }
 
         if (editandoId) {
           const n = npcs.find((n) => n.id === editandoId);
           Object.assign(n, {
-            nome: nome.value,
-            vidaMax: +vida.value,
-            vidaAtual: Math.min(n.vidaAtual, vida.value),
-            pdMax: Math.max(0, Number(pdMaxInput.value || 16)),
-            pdAtual: Math.min(Number(n.pdAtual ?? 16), Math.max(0, Number(pdMaxInput.value || 16))),
+            nome: nomeLimpo,
+            vidaMax: vidaMaxima,
+            vidaAtual: Math.min(Number(n.vidaAtual ?? vidaMaxima), vidaMaxima),
+            pdMax: pdMaximo,
+            pdAtual: Math.min(Number(n.pdAtual ?? 16), pdMaximo),
             tipo: tipo.value,
             funcao: funcao.value,
             descricao: descricao.value,
@@ -177,11 +232,11 @@ const STORAGE_KEY = "npc_list";
         } else {
           npcs.push({
             id: crypto.randomUUID(),
-            nome: nome.value,
-            vidaAtual: +vida.value,
-            vidaMax: +vida.value,
-            pdAtual: Math.max(0, Number(pdMaxInput.value || 16)),
-            pdMax: Math.max(0, Number(pdMaxInput.value || 16)),
+            nome: nomeLimpo,
+            vidaAtual: vidaMaxima,
+            vidaMax: vidaMaxima,
+            pdAtual: pdMaximo,
+            pdMax: pdMaximo,
             funcao: funcao.value,
             tipo: tipo.value,
             descricao: descricao.value,
@@ -191,13 +246,14 @@ const STORAGE_KEY = "npc_list";
           });
         }
 
-        save();
+        if (!save()) return;
         closeModal();
         render();
       }
 
       function editarNPC(id = fichaAtualId) {
         const n = npcs.find((n) => n.id === id);
+        if (!n) return;
         editandoId = id;
 
         nome.value = n.nome;
@@ -206,8 +262,9 @@ const STORAGE_KEY = "npc_list";
         tipo.value = n.tipo;
         funcao.value = n.funcao || "";
         descricao.value = n.descricao;
-        imgX.value = n.imgX;
-        imgY.value = n.imgY;
+        imgX.value = n.imgX ?? 50;
+        imgY.value = n.imgY ?? 50;
+        imgInput.value = "";
         imagemTemp = n.imagem;
 
         fecharFicha();

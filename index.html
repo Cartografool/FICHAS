@@ -2,6 +2,7 @@
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>NPCs</title>
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -70,9 +71,11 @@
           <div class="stat-main">
             <div class="stat-icon" aria-label="Pontos de vida"><img src="assets/coracao.png" alt="Coração" /></div>
             <div id="vida-barra" class="stat-bar" role="progressbar" aria-label="PV restante" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
-              <button onclick="alterarVida(-1)" aria-label="Diminuir PV">‹</button>
+              <button onclick="alterarVida(-1)" aria-label="Diminuir PV em 1" title="Diminuir 1 PV">‹</button>
+              <button onclick="alterarVida(-5)" aria-label="Diminuir PV em 5" title="Diminuir 5 PV">⇇</button>
               <span class="stat-value">PV <span id="vida-texto">10/10</span></span>
-              <button onclick="alterarVida(1)" aria-label="Aumentar PV">›</button>
+              <button onclick="alterarVida(5)" aria-label="Aumentar PV em 5" title="Aumentar 5 PV">⇉</button>
+              <button onclick="alterarVida(1)" aria-label="Aumentar PV em 1" title="Aumentar 1 PV">›</button>
             </div>
           </div>
         </div>
@@ -81,9 +84,11 @@
           <div class="stat-main">
             <div class="stat-icon" aria-label="Pontos de determinação"><img src="assets/cerebro.png" alt="Cérebro" /></div>
             <div id="pd-barra" class="stat-bar" role="progressbar" aria-label="PD restante" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
-              <button onclick="alterarPD(-1)" aria-label="Diminuir PD">‹</button>
+              <button onclick="alterarPD(-1)" aria-label="Diminuir PD em 1" title="Diminuir 1 PD">‹</button>
+              <button onclick="alterarPD(-5)" aria-label="Diminuir PD em 5" title="Diminuir 5 PD">⇇</button>
               <span class="stat-value">PD <span id="pd-texto">16/16</span></span>
-              <button onclick="alterarPD(1)" aria-label="Aumentar PD">›</button>
+              <button onclick="alterarPD(5)" aria-label="Aumentar PD em 5" title="Aumentar 5 PD">⇉</button>
+              <button onclick="alterarPD(1)" aria-label="Aumentar PD em 1" title="Aumentar 1 PD">›</button>
             </div>
           </div>
         </div>
