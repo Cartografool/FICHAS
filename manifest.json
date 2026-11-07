@@ -1,0 +1,15 @@
+{
+  "name": "FICHAS — Painel do Mestre",
+  "version": "1.0.0",
+  "manifest_version": 1,
+  "author": "Cartografool",
+  "description": "Painel privado de NPCs para o mestre. Requer login autorizado.",
+  "icon": "https://cartografool.github.io/FICHAS/assets/obr-icon.svg",
+  "action": {
+    "title": "FICHAS",
+    "icon": "https://cartografool.github.io/FICHAS/assets/obr-icon.svg",
+    "popover": "https://cartografool.github.io/FICHAS/",
+    "width": 900,
+    "height": 760
+  }
+}
